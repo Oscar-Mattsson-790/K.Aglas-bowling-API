@@ -1,4 +1,3 @@
-// models/db.js
 const sqlite3 = require("sqlite3").verbose();
 
 function createDbConnection() {
@@ -13,7 +12,7 @@ function createDbConnection() {
 function createTable(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS bookings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ID INTEGER PRIMARY KEY AUTOINCREMENT,
       date TEXT,
       email TEXT,
       time TEXT,
