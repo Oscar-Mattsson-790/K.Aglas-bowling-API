@@ -12,16 +12,22 @@ function createDbConnection() {
 function createTable(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS bookings (
-      ID INTEGER PRIMARY KEY AUTOINCREMENT,
+      bookingId INTEGER PRIMARY KEY AUTOINCREMENT,
       date TEXT,
       email TEXT,
       time TEXT,
       numPeople INTEGER,
       numCourses INTEGER,
-      shoeSizes TEXT,
       totalPrice INTEGER,
-      bookingNumber TEXT
-    )
+      bookingNumber TEXT,
+      shoeSizes TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS courses (
+      courseId INTEGER PRIMARY KEY AUTOINCREMENT,
+      bookingId INTEGER,
+      FOREIGN KEY (bookingId) REFERENCES bookings(bookingId)
+    );
   `);
 }
 

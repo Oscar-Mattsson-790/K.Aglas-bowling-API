@@ -34,15 +34,19 @@ router.put("/:bookingNumber", (req, res) => {
           return;
         }
 
+        // Recalculate the total price based on the updated values
+        const totalPrice = calculateTotalPrice(updatedBooking);
+
         // Update the booking in the database
         db.run(
           `UPDATE bookings
-           SET numPeople = ?, numCourses = ?, shoeSizes = ?
+           SET numPeople = ?, numCourses = ?, shoeSizes = ?, totalPrice = ?
            WHERE bookingNumber = ?`,
           [
             updatedBooking.numPeople,
             updatedBooking.numCourses,
             updatedBooking.shoeSizes,
+            totalPrice,
             bookingNumber,
           ],
           (err) => {
@@ -60,5 +64,9 @@ router.put("/:bookingNumber", (req, res) => {
     }
   );
 });
+
+function calculateTotalPrice(booking) {
+  return booking.numPeople * 120 + booking.numCourses * 100;
+}
 
 module.exports = router;

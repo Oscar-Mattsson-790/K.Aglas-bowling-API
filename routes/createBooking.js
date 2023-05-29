@@ -15,24 +15,31 @@ router.post("/", (req, res) => {
 
   // Insert the booking into the database
   db.run(
-    `INSERT INTO bookings (date, email, time, numPeople, numCourses, shoeSizes, totalPrice, bookingNumber)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      date,
-      email,
-      time,
-      numPeople,
-      numCourses,
-      shoeSizes,
-      totalPrice,
-      bookingNumber,
-    ],
+    `INSERT INTO bookings (date, email, time, numPeople, totalPrice, bookingNumber, shoeSizes)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [date, email, time, numPeople, totalPrice, bookingNumber, shoeSizes],
     function (err) {
       if (err) {
         console.log(err);
         res.status(500).json({ error: "Failed to create booking" });
       } else {
-        res.status(201).json({ bookingId: this.lastID });
+        const bookingId = this.lastID;
+
+        // Insert the courses into the database
+        for (let i = 0; i < numCourses; i++) {
+          db.run(
+            `INSERT INTO courses (bookingId) VALUES (?)`,
+            [bookingId],
+            function (err) {
+              if (err) {
+                console.log(err);
+                res.status(500).json({ error: "Failed to create booking" });
+              }
+            }
+          );
+        }
+
+        res.status(201).json({ bookingId });
       }
     }
   );
