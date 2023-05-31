@@ -1,10 +1,11 @@
 const express = require("express");
-const db = require("../models/db");
+const { db } = require("../models/db");
+const { checkBooking, verifyBookingNumber } = require("../middleware/bowling");
 
 const router = express.Router();
 
 // Update a booking
-router.put("/:bookingNumber", (req, res) => {
+router.put("/:bookingNumber", checkBooking, verifyBookingNumber, (req, res) => {
   const { bookingNumber } = req.params;
   const { numPeople, numCourses, shoeSizes } = req.body;
 

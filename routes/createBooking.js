@@ -1,23 +1,44 @@
 const express = require("express");
-const db = require("../models/db");
+const { db, checkBookingNumberExists } = require("../models/db");
 
 const router = express.Router();
 
+// Helper function to generate a booking number
+async function generateBookingNumber() {
+  const bookingNumber = Math.floor(Math.random() * 90000) + 10000;
+  const exists = await checkBookingNumberExists(bookingNumber);
+
+  if (exists) {
+    return await generateBookingNumber(); // If the generated booking number exists, generate again
+  }
+
+  return bookingNumber;
+}
+
 // Create a booking
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const { date, email, time, numPeople, numCourses, shoeSizes } = req.body;
 
   // Calculate the total price
   const totalPrice = numPeople * 120 + numCourses * 100;
 
-  // Generate a booking number (you can use a library like `shortid` for this)
-  const bookingNumber = generateBookingNumber();
+  // Generate a booking number
+  const bookingNumber = await generateBookingNumber();
 
   // Insert the booking into the database
   db.run(
-    `INSERT INTO bookings (date, email, time, numPeople, totalPrice, bookingNumber, shoeSizes)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [date, email, time, numPeople, totalPrice, bookingNumber, shoeSizes],
+    `INSERT INTO bookings (date, email, time, numPeople, numCourses, totalPrice, bookingNumber, shoeSizes)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      date,
+      email,
+      time,
+      numPeople,
+      numCourses,
+      totalPrice,
+      bookingNumber,
+      shoeSizes,
+    ],
     function (err) {
       if (err) {
         console.log(err);
@@ -44,11 +65,5 @@ router.post("/", (req, res) => {
     }
   );
 });
-
-// Helper function to generate a booking number
-function generateBookingNumber() {
-  // Generate a unique random number or use a library like `shortid`
-  return Math.floor(Math.random() * 90000) + 10000;
-}
 
 module.exports = router;

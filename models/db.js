@@ -33,4 +33,48 @@ function createTable(db) {
 
 const db = createDbConnection();
 
-module.exports = db;
+async function checkBookingExists(bookingNumber) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM bookings WHERE bookingNumber = ?",
+      [bookingNumber],
+      (err, row) => {
+        if (err) reject(err);
+        resolve(!!row);
+      }
+    );
+  });
+}
+
+async function checkBookingNumberExists(bookingNumber) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM bookings WHERE bookingNumber = ?",
+      [bookingNumber],
+      (err, row) => {
+        if (err) reject(err);
+        resolve(!!row);
+      }
+    );
+  });
+}
+
+async function checkCourseAvailability(date, time) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT * FROM bookings WHERE date = ? AND time = ?",
+      [date, time],
+      (err, row) => {
+        if (err) reject(err);
+        resolve(!!row);
+      }
+    );
+  });
+}
+
+module.exports = {
+  db,
+  checkBookingExists,
+  checkBookingNumberExists,
+  checkCourseAvailability,
+};
