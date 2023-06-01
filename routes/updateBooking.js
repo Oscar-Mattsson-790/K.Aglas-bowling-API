@@ -4,18 +4,21 @@ const { checkBooking, verifyBookingNumber } = require("../middleware/bowling");
 
 const router = express.Router();
 
+// Update a booking
 router.put("/:bookingNumber", checkBooking, verifyBookingNumber, (req, res) => {
   const { bookingNumber } = req.params;
   const { numPeople, numCourses, shoeSizes } = req.body;
 
+  // Check if the booking exists
   db.get(
-    `SELECT * FROM bookings WHERE bookingNumber = ?`,
+    "SELECT * FROM bookings WHERE bookingNumber = ?",
     [bookingNumber],
     (err, row) => {
       if (err) {
         console.log(err);
         res.status(500).json({ error: "Failed to update booking" });
       } else if (row) {
+        // Update the booking with new values
         const updatedBooking = {
           ...row,
           numPeople,
@@ -23,6 +26,7 @@ router.put("/:bookingNumber", checkBooking, verifyBookingNumber, (req, res) => {
           shoeSizes,
         };
 
+        // Check if the number of shoes matches the number of people
         const sizes = updatedBooking.shoeSizes.split(",").map(Number);
         if (sizes.length !== updatedBooking.numPeople) {
           res
@@ -31,8 +35,10 @@ router.put("/:bookingNumber", checkBooking, verifyBookingNumber, (req, res) => {
           return;
         }
 
+        // Recalculate the total price based on the updated values
         const totalPrice = calculateTotalPrice(updatedBooking);
 
+        // Update the booking in the database
         db.run(
           `UPDATE bookings
            SET numPeople = ?, numCourses = ?, shoeSizes = ?, totalPrice = ?
