@@ -20,13 +20,18 @@ function createTable(db) {
       numCourses INTEGER,
       totalPrice INTEGER,
       bookingNumber TEXT,
-      shoeSizes TEXT
+      shoeSizes TEXT,
+      courseId INTEGER
     );
-
     CREATE TABLE IF NOT EXISTS courses (
       courseId INTEGER PRIMARY KEY AUTOINCREMENT,
+      courseName TEXT
+    );
+    CREATE TABLE bookings_courses (
       bookingId INTEGER,
-      FOREIGN KEY (bookingId) REFERENCES bookings(bookingId)
+      courseId INTEGER,
+      FOREIGN KEY(bookingId) REFERENCES bookings(bookingId),
+      FOREIGN KEY(courseId) REFERENCES courses(courseId)
     );
   `);
 }
@@ -59,11 +64,11 @@ async function checkBookingNumberExists(bookingNumber) {
   });
 }
 
-async function checkCourseAvailability(date, time) {
+async function checkCourseAvailability(date, time, courseId) {
   return new Promise((resolve, reject) => {
     db.get(
-      `SELECT * FROM bookings WHERE date = ? AND time = ?`,
-      [date, time],
+      `SELECT * FROM bookings WHERE date = ? AND time = ? AND courseId = ?`,
+      [date, time, courseId],
       (err, row) => {
         if (err) reject(err);
         resolve(!!row);

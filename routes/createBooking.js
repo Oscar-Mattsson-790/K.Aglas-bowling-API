@@ -7,37 +7,44 @@ const {
 
 const router = express.Router();
 
-// Helper function to generate a booking number
 async function generateBookingNumber() {
   const bookingNumber = Math.floor(Math.random() * 90000) + 10000;
   const exists = await checkBookingNumberExists(bookingNumber);
 
   if (exists) {
-    return await generateBookingNumber(); // If the generated booking number exists, generate again
+    return await generateBookingNumber();
   }
 
   return bookingNumber;
 }
 
-// Create a booking
 router.post("/", async (req, res) => {
-  const { date, email, time, numPeople, numCourses, shoeSizes } = req.body;
+  const { date, email, time, numPeople, numCourses, shoeSizes, courseId } =
+    req.body;
 
-  // Calculate the total price
+  const shoeSizesArray = shoeSizes.split(",").map(Number);
+
+  if (shoeSizesArray.length !== numPeople) {
+    return res
+      .status(400)
+      .json({ error: "Number of shoe sizes must match number of people." });
+  }
+
   const totalPrice = numPeople * 120 + numCourses * 100;
 
-  // Generate a booking number
   const bookingNumber = await generateBookingNumber();
 
   try {
-    // Check course availability
-    const isCourseAvailable = await checkCourseAvailability(date, time);
+    const isCourseAvailable = await checkCourseAvailability(
+      date,
+      time,
+      courseId
+    );
 
     if (!isCourseAvailable) {
-      // Insert the booking into the database
       db.run(
-        `INSERT INTO bookings (date, email, time, numPeople, numCourses, totalPrice, bookingNumber, shoeSizes)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO bookings (date, email, time, numPeople, numCourses, totalPrice, bookingNumber, shoeSizes, courseId)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           date,
           email,
@@ -47,6 +54,7 @@ router.post("/", async (req, res) => {
           totalPrice,
           bookingNumber,
           shoeSizes,
+          courseId,
         ],
         function (err) {
           if (err) {
@@ -56,11 +64,10 @@ router.post("/", async (req, res) => {
 
           const bookingId = this.lastID;
 
-          // Insert the courses into the database
           for (let i = 0; i < numCourses; i++) {
             db.run(
-              `INSERT INTO courses (bookingId) VALUES (?)`,
-              [bookingId],
+              `INSERT INTO bookings_courses (bookingId, courseId) VALUES (?, ?)`,
+              [bookingId, courseId],
               function (err) {
                 if (err) {
                   console.log(err);
@@ -76,11 +83,9 @@ router.post("/", async (req, res) => {
         }
       );
     } else {
-      res
-        .status(400)
-        .json({
-          error: "Course already booked at the requested date and time",
-        });
+      res.status(400).json({
+        error: "Course already booked at the requested date and time",
+      });
     }
   } catch (err) {
     console.log(err);
