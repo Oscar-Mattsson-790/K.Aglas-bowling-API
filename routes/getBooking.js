@@ -3,12 +3,11 @@ const { db } = require("../models/db");
 
 const router = express.Router();
 
-// Get a booking by booking number
 router.get("/:bookingNumber", (req, res) => {
   const { bookingNumber } = req.params;
 
   db.get(
-    "SELECT * FROM bookings WHERE bookingNumber = ?",
+    `SELECT * FROM bookings WHERE bookingNumber = ?`,
     [bookingNumber],
     (err, row) => {
       if (err) {

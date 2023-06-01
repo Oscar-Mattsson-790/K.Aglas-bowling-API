@@ -36,7 +36,7 @@ const db = createDbConnection();
 async function checkBookingExists(bookingNumber) {
   return new Promise((resolve, reject) => {
     db.get(
-      "SELECT * FROM bookings WHERE bookingNumber = ?",
+      `SELECT * FROM bookings WHERE bookingNumber = ?`,
       [bookingNumber],
       (err, row) => {
         if (err) reject(err);
@@ -49,7 +49,7 @@ async function checkBookingExists(bookingNumber) {
 async function checkBookingNumberExists(bookingNumber) {
   return new Promise((resolve, reject) => {
     db.get(
-      "SELECT * FROM bookings WHERE bookingNumber = ?",
+      `SELECT * FROM bookings WHERE bookingNumber = ?`,
       [bookingNumber],
       (err, row) => {
         if (err) reject(err);
@@ -62,7 +62,7 @@ async function checkBookingNumberExists(bookingNumber) {
 async function checkCourseAvailability(date, time) {
   return new Promise((resolve, reject) => {
     db.get(
-      "SELECT * FROM bookings WHERE date = ? AND time = ?",
+      `SELECT * FROM bookings WHERE date = ? AND time = ?`,
       [date, time],
       (err, row) => {
         if (err) reject(err);

@@ -5,7 +5,7 @@ const bowlingRouter = require("./routes/bowling");
 
 app.use(express.json());
 
-app.use("/api", bowlingRouter); // Mount the bowling router at /api
+app.use("/api", bowlingRouter);
 
 try {
   app.listen(PORT, () => {
