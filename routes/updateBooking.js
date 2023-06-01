@@ -1,10 +1,6 @@
 const express = require("express");
-const { db } = require("../models/db");
-const {
-  checkBooking,
-  verifyBookingNumber,
-  checkCourseAvailability,
-} = require("../middleware/bowling");
+const { db, checkCourseAvailability } = require("../models/db");
+const { checkBooking, verifyBookingNumber } = require("../middleware/bowling");
 
 const router = express.Router();
 
@@ -87,11 +83,9 @@ router.put(
       }
     } catch (err) {
       console.log(err);
-      res
-        .status(500)
-        .json({
-          error: "An error occurred while checking course availability",
-        });
+      res.status(500).json({
+        error: "An error occurred while checking course availability",
+      });
     }
   }
 );

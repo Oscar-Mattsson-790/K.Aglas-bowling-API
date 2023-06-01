@@ -5,9 +5,9 @@ const {
 } = require("../models/db");
 
 async function checkBooking(req, res, next) {
-  const { bookingNumber, date, time } = req.body;
+  const { bookingNumber, date, time, courseId } = req.body;
 
-  if (!bookingNumber || !date || !time) {
+  if (!bookingNumber || !date || !time || !courseId) {
     return res.status(400).json({ error: "Required fields are missing" });
   }
 
