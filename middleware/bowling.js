@@ -13,11 +13,7 @@ async function checkBooking(req, res, next) {
 
   try {
     const isBookingExists = await checkBookingExists(bookingNumber);
-    const isCourseAlreadyBooked = await checkCourseAvailability(
-      date,
-      time,
-      courseId
-    );
+    const isCourseAlreadyBooked = await checkCourseAvailability(date, time);
 
     if (isBookingExists && !isCourseAlreadyBooked) {
       next();

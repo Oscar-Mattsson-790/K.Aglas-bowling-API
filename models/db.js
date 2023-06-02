@@ -64,14 +64,14 @@ async function checkBookingNumberExists(bookingNumber) {
   });
 }
 
-async function checkCourseAvailability(date, time, courseId) {
+async function checkCourseAvailability(date, time) {
   return new Promise((resolve, reject) => {
     db.get(
-      `SELECT * FROM bookings WHERE date = ? AND time = ? AND courseId = ?`,
-      [date, time, courseId],
+      `SELECT SUM(numCourses) as totalCourses FROM bookings WHERE date = ? AND time = ?`,
+      [date, time],
       (err, row) => {
         if (err) reject(err);
-        resolve(!!row);
+        resolve(row.totalCourses >= 8);
       }
     );
   });
